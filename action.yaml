@@ -13,11 +13,11 @@ inputs:
       description: Docker repository (e.g. senzing/senzingapi-runtime)
       required: true
    image-tag:
-      default: ${{ github.ref_name }}
+      default: latest
       description: Docker image tag
    password:
-      default: ${{ secrets.DOCKERHUB_PASSWORD }}
       description: Password for Docker registry
+      required: true
    platforms:
       default: linux/amd64
       description: Comma-separated list of docker platforms to build (hint - See output of docker buildx ls)
@@ -25,8 +25,8 @@ inputs:
       default: docker.io
       description: Docker registry server
    username:
-      default: ${{ secrets.DOCKERHUB_USERNAME }}
       description: Username for Docker registry
+      required: true
 
 runs:
    using: composite
