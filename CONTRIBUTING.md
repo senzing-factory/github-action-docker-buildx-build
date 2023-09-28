@@ -83,7 +83,7 @@ The variables are used throughout the installation procedure.
 
 ```console
 export GIT_ACCOUNT=senzing
-export GIT_REPOSITORY=github-action-docker-buildx
+export GIT_REPOSITORY=github-action-docker-buildx-build
 ```
 
 Synthesize environment variables.
