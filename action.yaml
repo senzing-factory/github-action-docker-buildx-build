@@ -4,27 +4,27 @@ description: Prepare the environment and run docker buildx build.
 author: support@senzing.com
 
 inputs:
-   dockerBuildOptions:
+   build-options:
       description: Additional options to pass to docker buildx build
-   dockerContext:
+   context:
       default: "."
       description: Context (directory) of the docker build process
-   dockerImageRepository:
+   image-repository:
       description: Docker repository (e.g. senzing/senzingapi-runtime)
       required: true
-   dockerImageTag:
+   image-tag:
       default: ${{ github.ref_name }}
       description: Docker image tag
-   dockerPassword:
+   password:
       default: ${{ secrets.DOCKERHUB_PASSWORD }}
       description: Password for Docker registry
-   dockerPlatforms:
+   platforms:
       default: linux/amd64
       description: Comma-separated list of docker platforms to build (hint - See output of docker buildx ls)
-   dockerRegistryServer:
+   registry-server:
       default: docker.io
       description: Docker registry server
-   dockerUsername:
+   username:
       default: ${{ secrets.DOCKERHUB_USERNAME }}
       description: Username for Docker registry
 
@@ -43,16 +43,16 @@ runs:
         run: docker buildx ls
         shell: bash
       - name: Dockerhub login
-        run: echo ${{ inputs.dockerPassword }} | docker login -u ${{ inputs.dockerUsername }} --password-stdin ${{ inputs.dockerRegistryServer }}
+        run: echo ${{ inputs.password }} | docker login -u ${{ inputs.username }} --password-stdin ${{ inputs.registry-server }}
         shell: bash
       - name: Docker build images
         run: |
            docker buildx build \
-              --platform ${{ inputs.dockerPlatforms }} \
-              --tag ${{ inputs.dockerRegistryServer }}/${{ inputs.dockerImageRepository }}:${{ inputs.dockerImageTag }} \
-              --tag ${{ inputs.dockerRegistryServer }}/${{ inputs.dockerImageRepository }}:latest \
-              ${{ inputs.dockerBuildOptions }} \
-              ${{ inputs.dockerContext }}
+              --platform ${{ inputs.platforms }} \
+              --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }} \
+              --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest \
+              ${{ inputs.build-options }} \
+              ${{ inputs.context }}
         shell: bash
 
 branding:
