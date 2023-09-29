@@ -1,4 +1,4 @@
-# github-action-docker-buildx-build.yml
+# github-action-docker-buildx-build.yaml
 name: Run docker buildx build
 description: Prepare the environment and run docker buildx build.
 author: support@senzing.com
