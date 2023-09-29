@@ -70,9 +70,10 @@ See also `inputs:` section of [action.yaml](action.yaml)
 
 ### build-options
 
-**Optional:** Command line arguments passed directly to `docker buildx build`
+Command line arguments passed directly to `docker buildx build`
 
-Default: "" (no build options)
+- Optional parameter
+- Default: "" (no build options)
 
 ### context
 
