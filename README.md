@@ -70,37 +70,53 @@ See also `inputs:` section of [action.yaml](action.yaml)
 
 ### build-options
 
-Command line arguments passed directly to `docker buildx build`
+**Optional:** Command line arguments passed directly to `docker buildx build`
+
+Default: "" (no build options)
 
 ### context
 
+**Optional:**
 The `docker` command's build context.
 See [Description](https://docs.docker.com/engine/reference/commandline/build/#description).
 
+Default: "."
+
 ### image-repository
 
+**Required:**
 The identifier of the Docker image.
 Example: `senzing/senzingapi-runtime`
 
 ### image-tag
 
+**Optional:**
 The tag appended to the Docker image identifier.
 Example:  the `1.2.3` in `senzing/senzingapi-runtime:1.2.3`
 
+Default: "latest"
+
 ### password
 
+**Required:**
 The password for the user on the Docker registry server.
 
 ### platforms
 
+**Optional:**
 The comma-separated list of platforms to build on.
 To find candidates, run `docker buildx ls`
 
+Default: "linux/amd64"
+
 ### registry-server
 
+**Optional:**
 The Docker registry server.
+
 Default: `docker.io`
 
 ### username
 
+**Required:**
 The username on the Docker registry server.
