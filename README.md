@@ -77,47 +77,50 @@ Command line arguments passed directly to `docker buildx build`
 
 ### context
 
-**Optional:**
 The `docker` command's build context.
 See [Description](https://docs.docker.com/engine/reference/commandline/build/#description).
 
-Default: "."
+- Optional parameter
+- Default: "."
 
 ### image-repository
 
-**Required:**
 The identifier of the Docker image.
-Example: `senzing/senzingapi-runtime`
+
+- Required parameter
+- Example: `senzing/senzingapi-runtime`
 
 ### image-tag
 
-**Optional:**
 The tag appended to the Docker image identifier.
 Example:  the `1.2.3` in `senzing/senzingapi-runtime:1.2.3`
 
-Default: "latest"
+- Optional parameter
+- Default: "latest"
 
 ### password
 
-**Required:**
 The password for the user on the Docker registry server.
+
+- Required parameter
 
 ### platforms
 
-**Optional:**
 The comma-separated list of platforms to build on.
 To find candidates, run `docker buildx ls`
 
-Default: "linux/amd64"
+- Optional parameter
+- Default: "linux/amd64"
 
 ### registry-server
 
-**Optional:**
 The Docker registry server.
 
-Default: `docker.io`
+- Optional parameter
+- Default: `docker.io`
 
 ### username
 
-**Required:**
 The username on the Docker registry server.
+
+- Required parameter
