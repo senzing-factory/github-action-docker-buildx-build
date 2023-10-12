@@ -10,11 +10,11 @@ The GitHub Action performs:
 
 1. [docker/setup-qemu-action@v3](https://github.com/docker/setup-qemu-action)
 1. [docker/setup-buildx-action@v3](https://github.com/docker/setup-buildx-action)
-1. Logs into a Docker registry (`docker.io` being the default)
+1. [docker/login-action@v3](https://github.com/docker/login-action) \
+    Logs into a Docker registry (`docker.io` being the default)
 1. Performs `docker buildx build`...
 
 ## Usage
-
 1. An example `.github/workflows/docker-build-container.yaml` file
    which verifies that the Docker image builds successfully:
 
@@ -32,7 +32,7 @@ The GitHub Action performs:
               with:
                   image-repository: senzing/test-ground
                   image-tag: ${{ github.ref_name }}
-                  password: ${{ secrets.DOCKERHUB_PASSWORD }}
+                  password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
     ```
 
@@ -57,7 +57,7 @@ The GitHub Action performs:
                   build-options: "--push"
                   image-repository: senzing/test-ground
                   image-tag: ${{ github.ref_name }}
-                  password: ${{ secrets.DOCKERHUB_PASSWORD }}
+                  password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
     ```
 
@@ -100,7 +100,9 @@ Example:  the `1.2.3` in `senzing/senzingapi-runtime:1.2.3`
 
 ### password
 
-The password for the user on the Docker registry server.
+The access token or password for the user on the Docker registry server. \
+It is recommended to use an [access token for login](https://github.com/docker/login-action#docker-hub). \
+Refer to the respective registry provider documentation for additional login details.
 
 - Required parameter
 
