@@ -19,7 +19,7 @@ inputs:
       description: Access Token for Docker registry
       required: true
    platforms:
-      default: linux/amd64
+      default: linux/amd64,linux/arm64
       description: Comma-separated list of docker platforms to build (hint - See output of docker buildx ls)
    registry-server:
       default: docker.io
@@ -46,9 +46,9 @@ runs:
       - name: Dockerhub login
         uses: docker/login-action@v3
         with:
-            registry: ${{ inputs.registry-server }}
-            username: ${{ inputs.username }}
-            password: ${{ inputs.password }}
+           registry: ${{ inputs.registry-server }}
+           username: ${{ inputs.username }}
+           password: ${{ inputs.password }}
       - name: Docker build images
         run: |
            docker buildx build \
