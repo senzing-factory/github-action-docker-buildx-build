@@ -50,10 +50,12 @@ runs:
            username: ${{ inputs.username }}
            password: ${{ inputs.password }}
       - name: Docker build images
+        shell: bash
         run: |
+           CLEANED_TAG=$(echo ${{ inputs.image-tag }} | tr -d "/#" )
            docker buildx build \
               --platform ${{ inputs.platforms }} \
-              --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }} \
+              --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:$CLEANED_TAG \
               --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest \
               ${{ inputs.build-options }} \
               ${{ inputs.context }}
