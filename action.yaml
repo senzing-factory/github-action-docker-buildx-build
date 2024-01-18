@@ -50,7 +50,6 @@ runs:
            username: ${{ inputs.username }}
            password: ${{ inputs.password }}
       - name: Docker build images
-        shell: bash
         run: |
            CLEANED_TAG=$(echo ${{ inputs.image-tag }} | tr -d "/#" )
            docker buildx build \
