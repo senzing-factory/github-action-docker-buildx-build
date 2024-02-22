@@ -15,6 +15,7 @@ The GitHub Action performs:
 1. Performs `docker buildx build`...
 
 ## Usage
+
 1. An example `.github/workflows/docker-build-container.yaml` file
    which verifies that the Docker image builds successfully:
 
