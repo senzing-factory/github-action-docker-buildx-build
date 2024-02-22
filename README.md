@@ -15,6 +15,7 @@ The GitHub Action performs:
 1. Performs `docker buildx build`...
 
 ## Usage
+
 1. An example `.github/workflows/docker-build-container.yaml` file
    which verifies that the Docker image builds successfully:
 
@@ -70,7 +71,7 @@ See also `inputs:` section of [action.yaml](action.yaml)
 
 ### build-options
 
-Command line arguments passed directly to `docker buildx build`
+Command-line arguments passed directly to `docker buildx build`
 
 - Optional parameter
 - Default: "" (no build options)
