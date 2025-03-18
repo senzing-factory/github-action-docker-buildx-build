@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning].
 
 ### Changed in 1.0.1
 
-- Checkout git repository submodules recursively
+- Checkout Git repository submodules recursively
 
 ## [1.0.0] - 2023-09-29
 
