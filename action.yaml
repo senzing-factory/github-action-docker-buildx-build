@@ -1,9 +1,11 @@
-# github-action-docker-buildx-build.yaml
 name: Run docker buildx build
 description: Prepare the environment and run docker buildx build.
 author: support@senzing.com
 
 inputs:
+  aws-region:
+    default: "us-east-1"
+    description: AWS region used for ECR login
   build-options:
     description: Additional options to pass to docker buildx build
   context:
@@ -15,58 +17,93 @@ inputs:
   image-tag:
     default: latest
     description: Docker image tag
+  login-to-dockerhub:
+    default: true
+    description: Bool, login to Dockerhub
+  login-to-ecr:
+    default: true
+    description: Bool, login to ECR
   password:
     description: Access Token for Docker registry
-    required: true
   platforms:
     default: linux/amd64,linux/arm64
     description: Comma-separated list of docker platforms to build (hint - See output of docker buildx ls)
+  push:
+    default: false
+    description: Bool, push image to registry
   registry-server:
     default: docker.io
     description: Docker registry server
+  role-session-name:
+    description: AWS role session name, required for ECR login
+  role-to-assume:
+    description: AWS role to assume, required for ECR login
   username:
     description: Username for Docker registry
-    required: true
 
 runs:
   using: composite
   steps:
-    - name: Checkout repository
+    - name: checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: "0"
         submodules: recursive
 
-    - name: Set up QEMU
+    - name: set up QEMU
       uses: docker/setup-qemu-action@v3
-      # https://github.com/docker/setup-qemu-action/issues/198
-      # with:
-      #  image: tonistiigi/binfmt:qemu-v7.0.0-28
 
-    - name: Set up Docker Buildx
+    - name: set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Docker list platforms
+    - name: docker list platforms
       run: docker buildx ls
       shell: bash
 
-    - name: Dockerhub login
+    - if: ${{ inputs.login-to-dockerhub }}
+      name: dockerhub login
       uses: docker/login-action@v3
       with:
         registry: ${{ inputs.registry-server }}
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 
-    - name: Docker build images
+    - if: ${{ inputs.login-to-ecr }}
+      name: configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        role-session-name: ${{ inputs.role-session-name }}
+        role-to-assume: ${{ inputs.role-to-assume }}
+
+    - id: login-ecr-public
+      if: ${{ inputs.login-to-ecr }}
+      name: login to Amazon ECR Public
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        registry-type: public
+
+    - name: generate tags
       run: |
         CLEANED_TAG=$(echo ${{ inputs.image-tag }} | tr -d "/#" )
-        docker buildx build \
-           --platform ${{ inputs.platforms }} \
-           --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:$CLEANED_TAG \
-           --tag ${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest \
-           ${{ inputs.build-options }} \
-           ${{ inputs.context }}
-      shell: bash
+        tags=""
+        if ${{ inputs.login-to-ecr }}; then
+          tags="${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.ecr-image-repository }}:$CLEANED_TAG,"
+          tags="${tags}${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.ecr-image-repository }}:latest,"
+        fi
+        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:$CLEANED_TAG,"
+        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest"
+        echo "[INFO] tags are: $tags"
+        echo "TAGS=${tags}" >> "$GITHUB_ENV"
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        build-args: ${{ inputs.build-options }}
+        context: ${{ inputs.context }}
+        platforms: ${{ inputs.platforms }}
+        push: ${{ inputs.push }}
+        tags: ${{ env.TAGS }}
 
 branding:
   icon: upload-cloud
