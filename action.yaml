@@ -41,6 +41,8 @@ inputs:
   username:
     description: Username for Docker registry
 
+shell: bash
+
 runs:
   using: composite
   steps:
@@ -58,7 +60,6 @@ runs:
 
     - name: docker list platforms
       run: docker buildx ls
-      shell: bash
 
     - if: ${{ inputs.login-to-dockerhub }}
       name: dockerhub login
