@@ -21,7 +21,7 @@ inputs:
     default: true
     description: Bool, login to Dockerhub
   login-to-ecr:
-    default: true
+    default: false
     description: Bool, login to ECR
   password:
     description: Access Token for Docker registry
