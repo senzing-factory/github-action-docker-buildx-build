@@ -41,8 +41,6 @@ inputs:
   username:
     description: Username for Docker registry
 
-shell: bash
-
 runs:
   using: composite
   steps:
@@ -96,6 +94,7 @@ runs:
         tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest"
         echo "[INFO] tags are: $tags"
         echo "TAGS=${tags}" >> "$GITHUB_ENV"
+      shell: bash
 
     - name: Build and push
       uses: docker/build-push-action@v6
