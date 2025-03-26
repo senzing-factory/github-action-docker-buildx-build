@@ -146,27 +146,27 @@ runs:
 
     - if: ${{ inputs.sign-image && inputs.login-to-dockerhub }}
       name: Sign the DockerHub images with GitHub OIDC Token
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-          TAGS: ${{ steps.docker_meta.outputs.tags }}
-        run: |
-          images=""
-          for tag in ${TAGS}; do
-            images+="${tag}@${DIGEST} "
-          done
-          cosign sign --yes ${images}
+      env:
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        TAGS: ${{ steps.docker_meta.outputs.tags }}
+      run: |
+        images=""
+        for tag in ${TAGS}; do
+          images+="${tag}@${DIGEST} "
+        done
+        cosign sign --yes ${images}
 
     - if: ${{ inputs.sign-image && inputs.login-to-ecr }}
       name: Sign the ECR images with GitHub OIDC Token
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-          TAGS: ${{ steps.docker_meta.outputs.tags }}
-        run: |
-          images=""
-          for tag in ${TAGS}; do
-            images+="${tag}@${DIGEST} "
-          done
-          cosign sign --yes ${images}
+      env:
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        TAGS: ${{ steps.docker_meta.outputs.tags }}
+      run: |
+        images=""
+        for tag in ${TAGS}; do
+          images+="${tag}@${DIGEST} "
+        done
+        cosign sign --yes ${images}
 
 branding:
   icon: upload-cloud
