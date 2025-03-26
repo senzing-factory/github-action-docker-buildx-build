@@ -125,7 +125,9 @@ runs:
         build-args: ${{ inputs.build-options }}
         context: ${{ inputs.context }}
         platforms: ${{ inputs.platforms }}
+        provenance: mode=max
         push: ${{ inputs.push }}
+        sbom: true
         tags: ${{ env.TAGS }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
