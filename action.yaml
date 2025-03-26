@@ -20,9 +20,11 @@ inputs:
   login-to-dockerhub:
     default: true
     description: Bool, login to Dockerhub
+    type: boolean
   login-to-ecr:
     default: false
     description: Bool, login to ECR
+    type: boolean
   password:
     description: Access Token for Docker registry
   platforms:
@@ -31,6 +33,7 @@ inputs:
   push:
     default: false
     description: Bool, push image to registry
+    type: boolean
   registry-server:
     default: docker.io
     description: Docker registry server
@@ -41,6 +44,7 @@ inputs:
   sign-image:
     default: false
     description: Sign and add attestations to the built image (true or false).
+    type: boolean
   username:
     description: Username for Docker registry
 
