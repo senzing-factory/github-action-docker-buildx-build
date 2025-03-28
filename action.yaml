@@ -202,6 +202,9 @@ runs:
         done
         cosign sign --yes ${images}
         for tag in ${TAGS}; do
+          echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+            --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+            ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${tag}"
           cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
             --certificate-identity=https://github.com/${{ github.workflow_ref }} \
             ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${tag}
@@ -220,6 +223,9 @@ runs:
         done
         cosign sign --yes ${images}
         for tag in ${TAGS}; do
+          echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+            --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:${tag}"
           cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
             --certificate-identity=https://github.com/${{ github.workflow_ref }} \
             ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:${tag}
