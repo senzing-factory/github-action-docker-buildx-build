@@ -201,6 +201,11 @@ runs:
           images+="${tag}@${DIGEST} "
         done
         cosign sign --yes ${images}
+        for tag in ${TAGS}; do
+          cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+            --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+            ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${tag}
+        done
       shell: bash
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
@@ -214,6 +219,11 @@ runs:
           images+="${tag}@${DIGEST} "
         done
         cosign sign --yes ${images}
+        for tag in ${TAGS}; do
+          cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+            --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:${tag}
+        done
       shell: bash
 
 branding:
