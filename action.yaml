@@ -133,6 +133,7 @@ runs:
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       uses: anchore/sbom-action@v0.18.0
       with:
+        artifact-name: dockerhub-sbom.spdx
         format: spdx-json
         image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
         output-file: dockerhub-sbom.json
@@ -140,6 +141,7 @@ runs:
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       uses: anchore/sbom-action@v0.18.0
       with:
+        artifact-name: ecr-sbom.spdx
         format: spdx-json
         image: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
         output-file: ecr-sbom.json
