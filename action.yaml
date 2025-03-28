@@ -184,8 +184,10 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        gh attestation verify --signer-repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
-        gh attestation verify --signer-repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+        gh attestation verify --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+        gh attestation verify --repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
       shell: bash
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
