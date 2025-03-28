@@ -130,14 +130,18 @@ runs:
         sbom: true
         tags: ${{ env.TAGS }}
 
-    - uses: senzing-factory/build-resources/.github/workflows/image-attestation.yaml@docker-updates
+    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
+      name: Generate DockerHub Attestations
+      uses: senzing-factory/github-action-docker-buildx-build/attestations@29-skern
       with:
         artifact-name-prefix: dockerhub
         image-repository: ${{ inputs.image-repository }}
         registry-server: ${{ inputs.registry-server }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
-    - uses: senzing-factory/build-resources/.github/workflows/image-attestation.yaml@docker-updates
+    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
+      name: Generate DockerHub Attestations
+      uses: senzing-factory/github-action-docker-buildx-build/attestations@29-skern
       with:
         artifact-name-prefix: ecr
         image-repository: ${{ inputs.image-repository }}
