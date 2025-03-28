@@ -140,7 +140,7 @@ runs:
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      name: Generate DockerHub Attestations
+      name: Generate ECR Attestations
       uses: senzing-factory/github-action-docker-buildx-build/attestations@29-skern
       with:
         artifact-name-prefix: ecr
@@ -149,36 +149,22 @@ runs:
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-      name: Sign the DockerHub images with GitHub OIDC Token
-      env:
-        DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
-      run: |
-        images=""
-        for tag in ${TAGS}; do
-          images+="${tag}@${DIGEST} "
-        done
-        cosign sign --yes ${images}
-        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
-      shell: bash
+      name: Sign Images
+      uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
+      with:
+        digest: ${{ steps.build-and-push.outputs.digest }}
+        image-repository: ${{ inputs.image-repository }}
+        image-tags: ${{ steps.docker_meta_dockerhub.outputs.tags }}
+        registry-server: ${{ inputs.registry-server }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      name: Sign the ECR images with GitHub OIDC Token
-      env:
-        DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: ${{ steps.docker_meta_ecr.outputs.tags }}
-      run: |
-        images=""
-        for tag in ${TAGS}; do
-          images+="${tag}@${DIGEST} "
-        done
-        cosign sign --yes ${images}
-        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}"
-      shell: bash
+      name: Sign Images
+      uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
+      with:
+        digest: ${{ steps.build-and-push.outputs.digest }}
+        image-repository: ${{ inputs.image-repository }}
+        image-tags: ${{ steps.docker_meta_dockerhub.outputs.tags }}
+        registry-server: ${{ steps.login-ecr-public.outputs.registry }}
 
 branding:
   icon: upload-cloud
