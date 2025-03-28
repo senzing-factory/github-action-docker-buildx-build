@@ -168,7 +168,7 @@ runs:
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
         sbom-path: sbom.json
         push-to-registry: true
-      
+
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       name: Generate SBOM attestation
       uses: actions/attest-sbom@v1
@@ -178,10 +178,13 @@ runs:
         sbom-path: sbom.json
         push-to-registry: true
 
-      - name: Verify Attestation
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: gh attestation verify --repo ${{ github.repository }} oci://ghcr.io/${{ github.repository_owner }}/${{ inputs.app }}@${{ needs.release.outputs.digest }}
+    - name: Verify Attestation
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        gh attestation verify --signer-repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+        gh attestation verify --signer-repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
+      shell: bash
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Sign the DockerHub images with GitHub OIDC Token
