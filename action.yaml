@@ -135,14 +135,14 @@ runs:
       with:
         format: spdx-json
         image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-        output-file: sbom.json
+        output-file: dockerhub-sbom.json
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       uses: anchore/sbom-action@v0.18.0
       with:
         format: spdx-json
         image: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
-        output-file: sbom.json
+        output-file: ecr-sbom.json
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Generate DockerHub artifact provenance attestation
@@ -166,7 +166,7 @@ runs:
       with:
         subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
-        sbom-path: sbom.json
+        sbom-path: dockerhub-sbom.json
         push-to-registry: true
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
@@ -175,7 +175,7 @@ runs:
       with:
         subject-name: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
-        sbom-path: sbom.json
+        sbom-path: ecr-sbom.json
         push-to-registry: true
 
     - name: Verify Attestation
