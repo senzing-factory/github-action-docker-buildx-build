@@ -20,33 +20,33 @@ inputs:
 
 runs:
   using: composite
-    steps:
-      - uses: anchore/sbom-action@v0.18.0
-        with:
-          artifact-name: ${{ inputs.artifact-name-prefix }}-sbom.spdx
-          format: spdx-json
-          image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-          output-file: ${{ inputs.artifact-name-prefix }}-sbom.json
+  steps:
+    - uses: anchore/sbom-action@v0.18.0
+      with:
+        artifact-name: ${{ inputs.artifact-name-prefix }}-sbom.spdx
+        format: spdx-json
+        image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
+        output-file: ${{ inputs.artifact-name-prefix }}-sbom.json
 
-      - name: Generate artifact provenance attestation
-        uses: actions/attest-build-provenance@v2
-        with:
-          push-to-registry: true
-          subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-          subject-digest: ${{ inputs.subject-digest }}
+    - name: Generate artifact provenance attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        push-to-registry: true
+        subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
+        subject-digest: ${{ inputs.subject-digest }}
 
-      - name: Generate SBOM attestation
-        uses: actions/attest-sbom@v1
-        with:
-          subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-          subject-digest: ${{ inputs.subject-digest }}
-          sbom-path: ${{ inputs.artifact-name-prefix }}-sbom.json
-          push-to-registry: true
+    - name: Generate SBOM attestation
+      uses: actions/attest-sbom@v1
+      with:
+        subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
+        subject-digest: ${{ inputs.subject-digest }}
+        sbom-path: ${{ inputs.artifact-name-prefix }}-sbom.json
+        push-to-registry: true
 
-      - env:
-          GITHUB_TOKEN: ${{ github.token }}
-        name: Verify DockerHub Attestation
-        run: |
-          gh attestation verify --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
-          gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
-        shell: bash
+    - env:
+        GITHUB_TOKEN: ${{ github.token }}
+      name: Verify DockerHub Attestation
+      run: |
+        gh attestation verify --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
+        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
+      shell: bash
