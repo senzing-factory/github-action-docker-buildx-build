@@ -7,20 +7,16 @@ inputs:
     default: dockerhub
     description: Default branch of the repository
     required: true
-    type: string
   image-repository:
     description: Docker repository (e.g. senzing/senzingapi-runtime)
     required: true
-    type: string
   registry-server:
     default: docker.io
     description: Docker registry server
     required: true
-    type: string
   subject-digest:
     description: Image digest
     required: true
-    type: string
 
 runs:
   using: composite
