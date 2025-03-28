@@ -153,18 +153,14 @@ runs:
       uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
       with:
         digest: ${{ steps.build-and-push.outputs.digest }}
-        image-repository: ${{ inputs.image-repository }}
         image-tags: ${{ steps.docker_meta_dockerhub.outputs.tags }}
-        registry-server: ${{ inputs.registry-server }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       name: Sign Images
       uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
       with:
         digest: ${{ steps.build-and-push.outputs.digest }}
-        image-repository: ${{ inputs.image-repository }}
         image-tags: ${{ steps.docker_meta_dockerhub.outputs.tags }}
-        registry-server: ${{ steps.login-ecr-public.outputs.registry }}
 
 branding:
   icon: upload-cloud

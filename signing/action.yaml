@@ -6,15 +6,8 @@ inputs:
   digest:
     description: Image digest
     required: true
-  image-repository:
-    description: Docker repository (e.g. senzing/senzingapi-runtime)
-    required: true
   image-tags:
     description: Image tags
-    required: true
-  registry-server:
-    default: docker.io
-    description: Docker registry server
     required: true
 
 runs:
@@ -32,5 +25,5 @@ runs:
         cosign sign --yes ${images}
         echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
           --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tags }}"
+          ${{ inputs.image-tags }}"
       shell: bash
