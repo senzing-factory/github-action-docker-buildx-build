@@ -121,7 +121,7 @@ runs:
       name: Build and push
       uses: docker/build-push-action@v6
       with:
-        annotations: ${{ steps.docker_meta.outputs.annotations }}
+        annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
         build-args: ${{ inputs.build-options }}
         context: ${{ inputs.context }}
         platforms: ${{ inputs.platforms }}
@@ -130,65 +130,19 @@ runs:
         sbom: true
         tags: ${{ env.TAGS }}
 
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-      uses: anchore/sbom-action@v0.18.0
+    - uses: senzing-factory/build-resources/.github/workflows/image-attestation.yaml@docker-updates
       with:
-        artifact-name: dockerhub-sbom.spdx
-        format: spdx-json
-        image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-        output-file: dockerhub-sbom.json
-
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      uses: anchore/sbom-action@v0.18.0
-      with:
-        artifact-name: ecr-sbom.spdx
-        format: spdx-json
-        image: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
-        output-file: ecr-sbom.json
-
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-      name: Generate DockerHub artifact provenance attestation
-      uses: actions/attest-build-provenance@v2
-      with:
-        push-to-registry: true
-        subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
+        artifact-name-prefix: dockerhub
+        image-repository: ${{ inputs.image-repository }}
+        registry-server: ${{ inputs.registry-server }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      name: Generate ECR artifact provenance attestation
-      uses: actions/attest-build-provenance@v2
+    - uses: senzing-factory/build-resources/.github/workflows/image-attestation.yaml@docker-updates
       with:
-        push-to-registry: true
-        subject-name: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
+        artifact-name-prefix: ecr
+        image-repository: ${{ inputs.image-repository }}
+        registry-server: ${{ steps.login-ecr-public.outputs.registry }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
-
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-      name: Generate SBOM attestation
-      uses: actions/attest-sbom@v1
-      with:
-        subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
-        subject-digest: ${{ steps.build-and-push.outputs.digest }}
-        sbom-path: dockerhub-sbom.json
-        push-to-registry: true
-
-    - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      name: Generate SBOM attestation
-      uses: actions/attest-sbom@v1
-      with:
-        subject-name: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
-        subject-digest: ${{ steps.build-and-push.outputs.digest }}
-        sbom-path: ecr-sbom.json
-        push-to-registry: true
-
-    - name: Verify Attestation
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        gh attestation verify --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
-        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
-        gh attestation verify --repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
-        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}@${{ steps.build-and-push.outputs.digest }}
-      shell: bash
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Sign the DockerHub images with GitHub OIDC Token
@@ -201,12 +155,9 @@ runs:
           images+="${tag}@${DIGEST} "
         done
         cosign sign --yes ${images}
-        for tag in ${TAGS}; do
-          echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-            --certificate-identity=https://github.com/${{ github.workflow_ref }} ${tag}"
-          cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-            --certificate-identity=https://github.com/${{ github.workflow_ref }} ${tag}
-        done
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
       shell: bash
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
@@ -220,12 +171,9 @@ runs:
           images+="${tag}@${DIGEST} "
         done
         cosign sign --yes ${images}
-        for tag in ${TAGS}; do
-          echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-            --certificate-identity=https://github.com/${{ github.workflow_ref }} ${tag}"
-          cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-            --certificate-identity=https://github.com/${{ github.workflow_ref }} ${tag}
-        done
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}"
       shell: bash
 
 branding:
