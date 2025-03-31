@@ -23,6 +23,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@v3
+
     - name: Sign the DockerHub images with GitHub OIDC Token
       run: |
         set -x

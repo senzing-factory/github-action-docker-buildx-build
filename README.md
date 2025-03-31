@@ -27,6 +27,7 @@ The GitHub Action performs:
    Skipped by default with `sign-image`
 1. [actions/attest-sbom@v1]
    Skipped by default with `sign-image`
+1. [sigstore/cosign-installer@v3]
 
 ## Usage
 
@@ -246,3 +247,4 @@ The username on the Docker registry server.
 [docker/setup-buildx-action@v3]: https://github.com/docker/setup-buildx-action
 [docker/setup-qemu-action@v3]: https://github.com/docker/setup-qemu-action
 [See Configure AWS Credential action documentation for additional details]: https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#using-this-action
+[sigstore/cosign-installer@v3]: https://github.com/sigstore/cosign-installer
