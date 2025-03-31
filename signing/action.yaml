@@ -31,6 +31,7 @@ runs:
         images=""
         for tag in ${{ inputs.image-tags }}; do
           images+="${tag}@${{ inputs.digest }} "
+          echo "[INFO] images: $images"
         done
         cosign sign --yes ${images}
 
