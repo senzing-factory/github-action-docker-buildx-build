@@ -156,7 +156,9 @@ runs:
       run: |
         images=""
         for tag in ${TAGS}; do
+          echo "[INFO] tag: $tag"
           images+="${tag}@${DIGEST} "
+          echo "[INFO] images: $images"
         done
         cosign sign --yes ${images}
         echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
