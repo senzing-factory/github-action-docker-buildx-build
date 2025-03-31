@@ -25,14 +25,15 @@ runs:
   steps:
     - name: Sign the DockerHub images with GitHub OIDC Token
       run: |
-        set -x
+        #set -x
         images=""
         echo "[INFO] image tags: ${{ inputs.image-tags }}"
         while IFS= read -r line; do
           echo "[INFO] line: $line"
           images+="${line}@${{ inputs.digest }} "
           echo "[INFO] images: $images"
-        done <<< ${{ inputs.image-tags }}
+        done <<< "${{ inputs.image-tags }}"
+
         #for tag in ${{ inputs.image-tags }}; do
         #  images+="${tag}@${{ inputs.digest }} "
         #  echo "[INFO] images: $images"
