@@ -181,6 +181,7 @@ runs:
       uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
       with:
         digest: ${{ steps.build-and-push.outputs.digest }}
+        image-tag: ${{ inputs.image-tag }}
         image-tags: ${{ steps.docker_meta_ecr.outputs.tags }}
         image-repository: ${{ inputs.image-repository }}
         registry-server: ${{ steps.login-ecr-public.outputs.registry }}

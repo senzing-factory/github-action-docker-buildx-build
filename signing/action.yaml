@@ -9,6 +9,9 @@ inputs:
   image-repository:
     description: Docker repository (e.g. senzing/senzingapi-runtime)
     required: true
+  image-tag:
+    description: Image tag
+    required: true
   image-tags:
     description: Image tags
     required: true
