@@ -30,7 +30,7 @@ runs:
         echo "[INFO] image tags: ${{ inputs.image-tags }}"
         while IFS= read -r line || [[ -n $line ]]; do
           echo "[INFO] line: $line"
-          images+="${line}@test "
+          images+="${line}@${{ inputs.digest }} "
           echo "[INFO] images: $images"
         done < <(printf '%s' "${{ inputs.image-tags }}")
 
