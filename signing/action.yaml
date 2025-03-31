@@ -21,13 +21,11 @@ runs:
   using: composite
   steps:
     - name: Sign the DockerHub images with GitHub OIDC Token
-      env:
-        DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
       run: |
         images=""
         for tag in ${{ inputs.image-tags }}; do
           images+="${tag}@${{ inputs.digest }} "
+          echo "[INFO] images: $images"
         done
         cosign sign --yes ${images}
         cleaned_tag=$(${{ github.ref }} | cut -d/ -f3)
