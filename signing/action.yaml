@@ -38,4 +38,11 @@ runs:
 
         echo "[INFO] cosign sign --yes ${images}"
         cosign sign --yes ${images}
+
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
+        cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}
       shell: bash
