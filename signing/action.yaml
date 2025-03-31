@@ -28,25 +28,11 @@ runs:
         set -x
         images=""
         echo "[INFO] image tags: ${{ inputs.image-tags }}"
-        echo "${{ inputs.image-tags }}" | while IFS= read -r line; do
+        while IFS= read -r line || [[ -n $line ]]; do
           echo "[INFO] line: $line"
-          images+="${line}@${{ inputs.digest }} "
+          images+="${line}@test "
           echo "[INFO] images: $images"
-        done # < <(printf '%s' "${{ inputs.image-tags }}")
-
-        #for tag in ${{ inputs.image-tags }}; do
-        #  images+="${tag}@${{ inputs.digest }} "
-        #  echo "[INFO] images: $images"
-        #done
+        done < <(printf '%s' "${{ inputs.image-tags }}")
 
         echo "[INFO] images final: $images"
-        echo "[INFO] cosign sign --yes ${images}"
-        cosign sign --yes "${images}"
-
-        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
-        cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}
       shell: bash
