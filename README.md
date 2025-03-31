@@ -21,6 +21,13 @@ The GitHub Action performs:
    Logs into a public ECR registry
    Skipped by default with `login-to-ecr`
 1. [docker/build-push-action@v6]
+1. [anchore/sbom-action@v0.18.0]
+   Skipped by default with `sign-image`
+1. [actions/attest-build-provenance@v2]
+   Skipped by default with `sign-image`
+1. [actions/attest-sbom@v1]
+   Skipped by default with `sign-image`
+1. [sigstore/cosign-installer@v3]
 
 ## Usage
 
@@ -101,6 +108,32 @@ The GitHub Action performs:
 
    Notice the addition of the `build-options` input.
    Used by the `docker/build-push-action` action `build-args` input.
+
+1. An example `.github/workflows/docker-push-container-to-dockerhub.yaml` file
+   which builds Docker images, pushes them to DockerHub, and addes signing and attestations:
+
+   ```yaml
+   name: docker-push-container-to-dockerhub.yaml
+
+   on:
+     push:
+       tags:
+         - "[0-9]+.[0-9]+.[0-9]+"
+
+   jobs:
+     docker-push-containers-to-dockerhub:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Build docker image and push to DockerHub
+           uses: Senzing/github-action-docker-buildx-build@v2
+           with:
+             image-repository: senzing/test-ground
+             image-tag: ${{ github.ref_name }}
+             password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+             push: true
+             sign-image: true
+             username: ${{ secrets.DOCKERHUB_USERNAME }}
+   ```
 
 ## Inputs
 
@@ -191,13 +224,21 @@ The Docker registry server.
 - Only needed if using ECR login.
 - [See Configure AWS Credential action documentation for additional details]
 
+### sign-image
+
+- Optional parameter
+- Only needed for signing and adding attestations. Should be limited to tag builds.
+
 ### username
 
 The username on the Docker registry server.
 
 [action.yaml]: action.yaml
+[actions/attest-build-provenance@v2]: https://github.com/actions/attest-build-provenance
+[actions/attest-sbom@v1]: https://github.com/actions/attest-sbom
 [actions/checkout@v4]: https://github.com/actions/checkout
 [access token for login]: https://github.com/docker/login-action#docker-hub
+[anchore/sbom-action@v0.18.0]: https://github.com/anchore/sbom-action
 [aws-actions/amazon-ecr-login@v2]: https://github.com/aws-actions/amazon-ecr-login
 [aws-actions/configure-aws-credentials@v4]: https://github.com/aws-actions/configure-aws-credentials
 [Description]: https://docs.docker.com/engine/reference/commandline/build/#description
@@ -206,3 +247,4 @@ The username on the Docker registry server.
 [docker/setup-buildx-action@v3]: https://github.com/docker/setup-buildx-action
 [docker/setup-qemu-action@v3]: https://github.com/docker/setup-qemu-action
 [See Configure AWS Credential action documentation for additional details]: https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#using-this-action
+[sigstore/cosign-installer@v3]: https://github.com/sigstore/cosign-installer

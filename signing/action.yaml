@@ -1,0 +1,51 @@
+name: Sign Image
+description: Sign the images with GitHub OIDC Token.
+author: support@senzing.com
+
+inputs:
+  digest:
+    description: Image digest
+    required: true
+  image-repository:
+    description: Docker repository (e.g. senzing/senzingapi-runtime)
+    required: true
+  image-tag:
+    description: Image tag
+    required: true
+  image-tags:
+    description: Image tags
+    required: true
+  registry-server:
+    default: docker.io
+    description: Docker registry server
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@v3
+
+    - name: Sign the DockerHub images with GitHub OIDC Token
+      run: |
+        set -x
+        images=""
+        echo "[INFO] image tags: ${{ inputs.image-tags }}"
+        while IFS= read -r line || [[ -n $line ]]; do
+          echo "[INFO] line: $line"
+          images+="${line}@${{ inputs.digest }} "
+          echo "[INFO] images: $images"
+        done < <(printf '%s' "${{ inputs.image-tags }}")
+
+        echo "[INFO] images final: $images"
+
+        echo "[INFO] cosign sign --yes ${images}"
+        cosign sign --yes ${images}
+
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
+        cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}
+      shell: bash
