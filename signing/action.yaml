@@ -20,18 +20,21 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Sign the DockerHub images with GitHub OIDC Token
+    - env:
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
+      name: Sign the DockerHub images with GitHub OIDC Token
       run: |
         images=""
-        for tag in ${{ inputs.image-tags }}; do
-          images+="${tag}@${{ inputs.digest }} "
-          echo "[INFO] images: $images"
+        for tag in ${TAGS}; do
+          images+="${tag}@${DIGEST} "
         done
         cosign sign --yes ${images}
-        cleaned_tag=$(${{ github.ref }} | cut -d/ -f3)
-        echo "[INFO] cleaned tag is $cleaned_tag"
-        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com --certificate-identity=https://github.com/${{ github.workflow_ref }} ${{ inputs.registry-server }}/${{ inputs.image-repository }}:$cleaned_tag"
+
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
         cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
           --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:$cleaned_tag
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}
       shell: bash
