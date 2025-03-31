@@ -28,7 +28,7 @@ runs:
         images=""
         while IFS= read -r line; do
           images+="${line}@${{ inputs.digest }} "
-          echo "[INFO] images: $images
+          echo "[INFO] images: $images"
         done <<< ${{ inputs.image-tags }}
         #for tag in ${{ inputs.image-tags }}; do
         #  images+="${tag}@${{ inputs.digest }} "
