@@ -38,6 +38,7 @@ runs:
         #  images+="${tag}@${{ inputs.digest }} "
         #  echo "[INFO] images: $images"
         #done
+        echo "[INFO] cosign sign --yes ${images}"
         cosign sign --yes ${images}
 
         echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
