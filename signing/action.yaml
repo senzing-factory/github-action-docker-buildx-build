@@ -23,16 +23,17 @@ inputs:
 runs:
   using: composite
   steps:
-    - env:
-        DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
-      name: Sign the DockerHub images with GitHub OIDC Token
+    - name: Sign the DockerHub images with GitHub OIDC Token
       run: |
         images=""
-        for tag in ${{ inputs.image-tags }}; do
-          images+="${tag}@${{ inputs.digest }} "
-          echo "[INFO] images: $images"
-        done
+        while IFS= read -r line; do
+          images+="${line}@${{ inputs.digest }} "
+          echo "[INFO] images: $images
+        done <<< ${{ inputs.image-tags }}
+        #for tag in ${{ inputs.image-tags }}; do
+        #  images+="${tag}@${{ inputs.digest }} "
+        #  echo "[INFO] images: $images"
+        #done
         cosign sign --yes ${images}
 
         echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
