@@ -114,11 +114,22 @@ runs:
           type=semver,pattern={{version}}
           type=sha,format=long
 
+    - name: generate annotations
+      run: |
+        annotations=""
+        if ${{ inputs.login-to-ecr == 'true' }}; then
+          annotations="${{ steps.docker_meta_ecr.outputs.annotations }} \n"
+        fi
+        annotations="${annotations}${{ steps.docker_meta_dockerhub.outputs.annotations }}"
+        echo "[INFO] annotations are: $annotations"
+        echo "ANNOTATIONS=${annotations}" >> "$GITHUB_ENV"
+      shell: bash
+
     - id: build-and-push
       name: Build and push
       uses: docker/build-push-action@v6
       with:
-        annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
+        annotations: ${{ env.ANNOTATIONS }}
         build-args: ${{ inputs.build-options }}
         context: ${{ inputs.context }}
         platforms: ${{ inputs.platforms }}
