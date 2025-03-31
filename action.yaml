@@ -129,7 +129,7 @@ runs:
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Generate DockerHub Attestations
-      uses: senzing-factory/github-action-docker-buildx-build/attestations@29-skern
+      uses: senzing-factory/github-action-docker-buildx-build/attestations@v2
       with:
         artifact-name-prefix: dockerhub
         image-repository: ${{ inputs.image-repository }}
@@ -138,7 +138,7 @@ runs:
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       name: Generate ECR Attestations
-      uses: senzing-factory/github-action-docker-buildx-build/attestations@29-skern
+      uses: senzing-factory/github-action-docker-buildx-build/attestations@v2
       with:
         artifact-name-prefix: ecr
         image-repository: ${{ inputs.image-repository }}
@@ -147,7 +147,7 @@ runs:
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Sign DockerHub Images
-      uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
+      uses: senzing-factory/github-action-docker-buildx-build/signing@v2
       with:
         digest: ${{ steps.build-and-push.outputs.digest }}
         image-tag: ${{ inputs.image-tag }}
@@ -157,7 +157,7 @@ runs:
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       name: Sign ECR Images
-      uses: senzing-factory/github-action-docker-buildx-build/signing@29-skern
+      uses: senzing-factory/github-action-docker-buildx-build/signing@v2
       with:
         digest: ${{ steps.build-and-push.outputs.digest }}
         image-tag: ${{ inputs.image-tag }}
