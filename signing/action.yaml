@@ -35,4 +35,7 @@ runs:
         done < <(printf '%s' "${{ inputs.image-tags }}")
 
         echo "[INFO] images final: $images"
+
+        echo "[INFO] cosign sign --yes ${images}"
+        cosign sign --yes ${images}
       shell: bash
