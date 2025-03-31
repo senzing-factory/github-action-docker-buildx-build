@@ -28,7 +28,7 @@ runs:
         set -x
         images=""
         echo "[INFO] image tags: ${{ inputs.image-tags }}"
-        echo ${{ inputs.image-tags }} | while IFS= read -r line; do
+        echo "${{ inputs.image-tags }}" | while IFS= read -r line; do
           echo "[INFO] line: $line"
           images+="${line}@${{ inputs.digest }} "
           echo "[INFO] images: $images"
