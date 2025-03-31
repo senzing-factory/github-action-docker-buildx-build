@@ -149,20 +149,20 @@ runs:
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-       name: Sign the DockerHub images with GitHub OIDC Token
-       env:
-         DIGEST: ${{ steps.build-and-push.outputs.digest }}
-         TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
-       run: |
-         images=""
-         for tag in ${TAGS}; do
-           images+="${tag}@${DIGEST} "
-         done
-         cosign sign --yes ${images}
-         echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-           --certificate-identity=https://github.com/${{ github.workflow_ref }} \
-           ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
-       shell: bash
+      name: Sign the DockerHub images with GitHub OIDC Token
+      env:
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        TAGS: ${{ steps.docker_meta_dockerhub.outputs.tags }}
+      run: |
+        images=""
+        for tag in ${TAGS}; do
+          images+="${tag}@${DIGEST} "
+        done
+        cosign sign --yes ${images}
+        echo "[INFO] cosign verify --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity=https://github.com/${{ github.workflow_ref }} \
+          ${{ inputs.registry-server }}/${{ inputs.image-repository }}:${{ inputs.image-tag }}"
+      shell: bash
 
     #- if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
     #  name: Sign Images
