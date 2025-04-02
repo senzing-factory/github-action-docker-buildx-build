@@ -11,6 +11,9 @@ inputs:
   context:
     default: "."
     description: Context (directory) of the docker build process
+  dockerfile-path:
+    default: "./Dockerfile"
+    description:
   image-repository:
     description: Docker repository (e.g. senzing/senzingapi-runtime)
     required: true
@@ -121,6 +124,7 @@ runs:
         annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
         build-args: ${{ inputs.build-options }}
         context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile-path }}
         platforms: ${{ inputs.platforms }}
         provenance: mode=max
         push: ${{ inputs.push }}

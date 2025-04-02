@@ -160,6 +160,14 @@ See [Description].
 - Optional parameter
 - Default: "."
 
+### dockerfile-path
+
+Path to the Dockerfile.
+Hint: If you have overridden the default context you likely need to set this.
+
+- Optional parameter
+- Default: "./Dockerfile"
+
 ### image-repository
 
 The identifier of the Docker image.
