@@ -98,7 +98,9 @@ The GitHub Action performs:
          - name: Build docker image and push to DockerHub
            uses: Senzing/github-action-docker-buildx-build@v2
            with:
-             build-options: "--build-arg SENZING_ACCEPT_EULA=I_ACCEPT_THE_SENZING_EULA --build-arg ACCEPT_EULA=Y"
+             build-options: |
+               SENZING_ACCEPT_EULA=I_ACCEPT_THE_SENZING_EULA
+               ACCEPT_EULA=Y
              image-repository: senzing/test-ground
              image-tag: ${{ github.ref_name }}
              password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
@@ -151,6 +153,8 @@ Command-line arguments passed directly to `docker buildx build`
 
 - Optional parameter
 - Default: "" (no build options)
+- Note: Parameters should be provided as a List.
+  List type is a newline-delimited string
 
 ### context
 
