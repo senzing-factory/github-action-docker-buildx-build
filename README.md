@@ -112,7 +112,7 @@ The GitHub Action performs:
    Used by the `docker/build-push-action` action `build-args` input.
 
 1. An example `.github/workflows/docker-push-container-to-dockerhub.yaml` file
-   which builds Docker images, pushes them to DockerHub, and addes signing and attestations:
+   which builds Docker images, pushes them to DockerHub, and adds signing and attestations:
 
    ```yaml
    name: docker-push-container-to-dockerhub.yaml
