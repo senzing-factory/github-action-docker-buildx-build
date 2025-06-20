@@ -1,0 +1,17 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "anchore",
+    "buildx",
+    "CCLA",
+    "CODEOWNER",
+    "dockerhub",
+    "ICLA",
+    "Senzing",
+    "senzingapi",
+    "sigstore",
+    "stackoverflow"
+  ],
+  "ignorePaths": [".git/**"]
+}
