@@ -101,7 +101,7 @@ runs:
 
     - id: docker_meta_dockerhub
       if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
-      uses: docker/metadata-action@v5.9.0
+      uses: docker/metadata-action@v5.10.0
       with:
         images: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
         tags: |
@@ -110,7 +110,7 @@ runs:
 
     - id: docker_meta_ecr
       if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
-      uses: docker/metadata-action@v5.9.0
+      uses: docker/metadata-action@v5.10.0
       with:
         images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
         tags: |
