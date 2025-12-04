@@ -2,13 +2,14 @@
   "version": "0.2",
   "language": "en",
   "words": [
-    "anchore",
-    "buildx",
     "CCLA",
     "CODEOWNER",
-    "dockerhub",
     "ICLA",
     "Senzing",
+    "anchore",
+    "buildx",
+    "dockerhub",
+    "esbenp",
     "senzingapi",
     "sigstore",
     "stackoverflow"
