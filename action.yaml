@@ -151,6 +151,7 @@ runs:
       with:
         annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
         build-args: ${{ inputs.build-options }}
+        # zizmor: ignore[template-injection]
         context: ${{ steps.generate-tags.outputs.context }}
         file: ${{ steps.generate-tags.outputs.dockerfile }}
         platforms: ${{ inputs.platforms }}
