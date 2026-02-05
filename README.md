@@ -8,13 +8,14 @@ A GitHub Action for invoking `docker buildx build`.
 
 The GitHub Action performs:
 
-1. [actions/checkout@v4]
+1. [actions/checkout@v6] \
+   Can be skipped with `skip-checkout` input
 1. [docker/setup-qemu-action@v3]
 1. [docker/setup-buildx-action@v3]
 1. [docker/login-action@v3] \
    Logs into a Docker registry (`docker.io` being the default)
    Can be skipped with `login-to-dockerhub` input
-1. [aws-actions/configure-aws-credentials@v4]
+1. [aws-actions/configure-aws-credentials@v6]
    Configure credentials for ECR registry login
    Skipped by default with `login-to-ecr`
 1. [aws-actions/amazon-ecr-login@v2]
@@ -241,6 +242,16 @@ The Docker registry server.
 - Optional parameter
 - Only needed for signing and adding attestations. Should be limited to tag builds.
 
+### skip-checkout
+
+Skip the repository checkout step.
+Useful when you need to set up the build context yourself before calling this action,
+such as when build artifacts are downloaded from external sources (e.g., S3) and need
+to be included in the Docker build context.
+
+- Optional parameter
+- Default: false
+
 ### username
 
 The username on the Docker registry server.
@@ -248,11 +259,11 @@ The username on the Docker registry server.
 [action.yaml]: action.yaml
 [actions/attest-build-provenance@v2]: https://github.com/actions/attest-build-provenance
 [actions/attest-sbom@v1]: https://github.com/actions/attest-sbom
-[actions/checkout@v4]: https://github.com/actions/checkout
+[actions/checkout@v6]: https://github.com/actions/checkout
 [access token for login]: https://github.com/docker/login-action#docker-hub
 [anchore/sbom-action@v0.18.0]: https://github.com/anchore/sbom-action
 [aws-actions/amazon-ecr-login@v2]: https://github.com/aws-actions/amazon-ecr-login
-[aws-actions/configure-aws-credentials@v4]: https://github.com/aws-actions/configure-aws-credentials
+[aws-actions/configure-aws-credentials@v6]: https://github.com/aws-actions/configure-aws-credentials
 [Description]: https://docs.docker.com/engine/reference/commandline/build/#description
 [docker/build-push-action@v6]: https://github.com/docker/build-push-action
 [docker/login-action@v3]: https://github.com/docker/login-action

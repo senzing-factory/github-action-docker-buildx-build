@@ -44,16 +44,21 @@ inputs:
   sign-image:
     default: false
     description: Sign and add attestations to the built image (true or false).
+  skip-checkout:
+    default: false
+    description: Skip the checkout step. Useful when you need to set up the build context before calling this action.
   username:
     description: Username for Docker registry
 
 runs:
   using: composite
   steps:
-    - name: checkout repository
+    - if: ${{ inputs.skip-checkout != 'true' }}
+      name: checkout repository
       uses: actions/checkout@v6
       with:
         fetch-depth: "0"
+        persist-credentials: false
         submodules: recursive
 
     - name: set up QEMU
@@ -72,7 +77,7 @@ runs:
 
     - if: ${{ inputs.login-to-ecr == 'true' }}
       name: configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v5
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-region: ${{ inputs.aws-region }}
         role-session-name: ${{ inputs.role-session-name }}
@@ -85,18 +90,41 @@ runs:
       with:
         registry-type: public
 
-    - name: generate tags
+    - id: generate-tags
+      name: generate tags
+      env:
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        IMAGE_REPOSITORY: ${{ inputs.image-repository }}
+        REGISTRY_SERVER: ${{ inputs.registry-server }}
+        LOGIN_TO_ECR: ${{ inputs.login-to-ecr }}
+        ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+        BUILD_CONTEXT: ${{ inputs.context }}
+        DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
       run: |
-        CLEANED_TAG=$(echo ${{ inputs.image-tag }} | tr -d "/#" )
+        CLEANED_TAG=$(echo "$IMAGE_TAG" | tr -d "/#" )
         tags=""
-        if ${{ inputs.login-to-ecr == 'true' }}; then
-          tags="${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:$CLEANED_TAG,"
-          tags="${tags}${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:latest,"
+        if [[ "$LOGIN_TO_ECR" == "true" ]]; then
+          tags="${ECR_REGISTRY}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
+          tags="${tags}${ECR_REGISTRY}/${IMAGE_REPOSITORY}:latest,"
         fi
-        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:$CLEANED_TAG,"
-        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest"
+        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
+        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest"
         echo "[INFO] tags are: $tags"
-        echo "TAGS=${tags}" >> "$GITHUB_ENV"
+        echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+
+        # Validate context path - reject path traversal and unsafe characters
+        if [[ "$BUILD_CONTEXT" =~ \.\. ]] || [[ ! "$BUILD_CONTEXT" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+          echo "::error::Invalid context path: $BUILD_CONTEXT"
+          exit 1
+        fi
+        echo "context=${BUILD_CONTEXT}" >> "$GITHUB_OUTPUT"
+
+        # Validate dockerfile path
+        if [[ "$DOCKERFILE_PATH" =~ \.\. ]] || [[ ! "$DOCKERFILE_PATH" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+          echo "::error::Invalid dockerfile path: $DOCKERFILE_PATH"
+          exit 1
+        fi
+        echo "dockerfile=${DOCKERFILE_PATH}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - id: docker_meta_dockerhub
@@ -123,13 +151,14 @@ runs:
       with:
         annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
         build-args: ${{ inputs.build-options }}
-        context: ${{ inputs.context }}
-        file: ${{ inputs.dockerfile-path }}
+        # zizmor: ignore[template-injection]
+        context: ${{ steps.generate-tags.outputs.context }}
+        file: ${{ steps.generate-tags.outputs.dockerfile }}
         platforms: ${{ inputs.platforms }}
         provenance: mode=max
         push: ${{ inputs.push }}
         sbom: true
-        tags: ${{ env.TAGS }}
+        tags: ${{ steps.generate-tags.outputs.tags }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Generate DockerHub Attestations

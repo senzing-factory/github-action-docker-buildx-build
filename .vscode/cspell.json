@@ -12,7 +12,8 @@
     "esbenp",
     "senzingapi",
     "sigstore",
-    "stackoverflow"
+    "stackoverflow",
+    "zizmor"
   ],
   "ignorePaths": [".git/**"]
 }
