@@ -26,6 +26,9 @@ inputs:
   login-to-ecr:
     default: false
     description: Login to ECR
+  ecr-registry-type:
+    default: public
+    description: ECR registry type (public or private). Public ECR requires us-east-1 region.
   password:
     description: Access Token for Docker registry
   platforms:
@@ -83,12 +86,12 @@ runs:
         role-session-name: ${{ inputs.role-session-name }}
         role-to-assume: ${{ inputs.role-to-assume }}
 
-    - id: login-ecr-public
+    - id: login-ecr
       if: ${{ inputs.login-to-ecr == 'true' }}
-      name: login to Amazon ECR Public
+      name: login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
       with:
-        registry-type: public
+        registry-type: ${{ inputs.ecr-registry-type }}
 
     - id: generate-tags
       name: generate tags
@@ -97,7 +100,7 @@ runs:
         IMAGE_REPOSITORY: ${{ inputs.image-repository }}
         REGISTRY_SERVER: ${{ inputs.registry-server }}
         LOGIN_TO_ECR: ${{ inputs.login-to-ecr }}
-        ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_CONTEXT: ${{ inputs.context }}
         DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
       run: |
@@ -140,7 +143,7 @@ runs:
       if: ${{ inputs.sign-image == 'true' && inputs.login-to-ecr == 'true' }}
       uses: docker/metadata-action@v5.10.0
       with:
-        images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}
+        images: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image-repository }}
         tags: |
           type=semver,pattern={{version}}
           type=sha,format=long
@@ -175,7 +178,7 @@ runs:
       with:
         artifact-name-prefix: ecr
         image-repository: ${{ inputs.image-repository }}
-        registry-server: ${{ steps.login-ecr-public.outputs.registry }}
+        registry-server: ${{ steps.login-ecr.outputs.registry }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
@@ -196,7 +199,7 @@ runs:
         image-tag: ${{ inputs.image-tag }}
         image-tags: ${{ steps.docker_meta_ecr.outputs.tags }}
         image-repository: ${{ inputs.image-repository }}
-        registry-server: ${{ steps.login-ecr-public.outputs.registry }}
+        registry-server: ${{ steps.login-ecr.outputs.registry }}
 
 branding:
   icon: upload-cloud
