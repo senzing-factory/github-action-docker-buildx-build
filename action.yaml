@@ -111,8 +111,19 @@ runs:
         tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest"
         echo "[INFO] tags are: $tags"
         echo "tags=${tags}" >> "$GITHUB_OUTPUT"
-        # Pass through validated context and dockerfile path
+
+        # Validate context path - reject path traversal and unsafe characters
+        if [[ "$BUILD_CONTEXT" =~ \.\. ]] || [[ ! "$BUILD_CONTEXT" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+          echo "::error::Invalid context path: $BUILD_CONTEXT"
+          exit 1
+        fi
         echo "context=${BUILD_CONTEXT}" >> "$GITHUB_OUTPUT"
+
+        # Validate dockerfile path
+        if [[ "$DOCKERFILE_PATH" =~ \.\. ]] || [[ ! "$DOCKERFILE_PATH" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+          echo "::error::Invalid dockerfile path: $DOCKERFILE_PATH"
+          exit 1
+        fi
         echo "dockerfile=${DOCKERFILE_PATH}" >> "$GITHUB_OUTPUT"
       shell: bash
 
