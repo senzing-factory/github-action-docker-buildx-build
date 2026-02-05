@@ -44,16 +44,21 @@ inputs:
   sign-image:
     default: false
     description: Sign and add attestations to the built image (true or false).
+  skip-checkout:
+    default: false
+    description: Skip the checkout step. Useful when you need to set up the build context before calling this action.
   username:
     description: Username for Docker registry
 
 runs:
   using: composite
   steps:
-    - name: checkout repository
+    - if: ${{ inputs.skip-checkout != 'true' }}
+      name: checkout repository
       uses: actions/checkout@v6
       with:
         fetch-depth: "0"
+        persist-credentials: false
         submodules: recursive
 
     - name: set up QEMU
@@ -86,15 +91,21 @@ runs:
         registry-type: public
 
     - name: generate tags
+      env:
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        IMAGE_REPOSITORY: ${{ inputs.image-repository }}
+        REGISTRY_SERVER: ${{ inputs.registry-server }}
+        LOGIN_TO_ECR: ${{ inputs.login-to-ecr }}
+        ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
       run: |
-        CLEANED_TAG=$(echo ${{ inputs.image-tag }} | tr -d "/#" )
+        CLEANED_TAG=$(echo "$IMAGE_TAG" | tr -d "/#" )
         tags=""
-        if ${{ inputs.login-to-ecr == 'true' }}; then
-          tags="${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:$CLEANED_TAG,"
-          tags="${tags}${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.image-repository }}:latest,"
+        if [[ "$LOGIN_TO_ECR" == "true" ]]; then
+          tags="${ECR_REGISTRY}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
+          tags="${tags}${ECR_REGISTRY}/${IMAGE_REPOSITORY}:latest,"
         fi
-        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:$CLEANED_TAG,"
-        tags="${tags}${{ inputs.registry-server }}/${{ inputs.image-repository }}:latest"
+        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
+        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest"
         echo "[INFO] tags are: $tags"
         echo "TAGS=${tags}" >> "$GITHUB_ENV"
       shell: bash

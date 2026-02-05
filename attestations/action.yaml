@@ -45,8 +45,12 @@ runs:
 
     - env:
         GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        REGISTRY_SERVER: ${{ inputs.registry-server }}
+        IMAGE_REPOSITORY: ${{ inputs.image-repository }}
+        SUBJECT_DIGEST: ${{ inputs.subject-digest }}
       name: Verify DockerHub Attestation
       run: |
-        gh attestation verify --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
-        gh attestation verify --signer-repo ${{ github.repository }} --repo ${{ github.repository }} oci://${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
+        gh attestation verify --repo "$GITHUB_REPOSITORY" "oci://${REGISTRY_SERVER}/${IMAGE_REPOSITORY}@${SUBJECT_DIGEST}"
+        gh attestation verify --signer-repo "$GITHUB_REPOSITORY" --repo "$GITHUB_REPOSITORY" "oci://${REGISTRY_SERVER}/${IMAGE_REPOSITORY}@${SUBJECT_DIGEST}"
       shell: bash

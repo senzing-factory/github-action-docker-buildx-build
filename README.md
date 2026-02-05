@@ -8,7 +8,8 @@ A GitHub Action for invoking `docker buildx build`.
 
 The GitHub Action performs:
 
-1. [actions/checkout@v4]
+1. [actions/checkout@v4] \
+   Can be skipped with `skip-checkout` input
 1. [docker/setup-qemu-action@v3]
 1. [docker/setup-buildx-action@v3]
 1. [docker/login-action@v3] \
@@ -240,6 +241,16 @@ The Docker registry server.
 
 - Optional parameter
 - Only needed for signing and adding attestations. Should be limited to tag builds.
+
+### skip-checkout
+
+Skip the repository checkout step.
+Useful when you need to set up the build context yourself before calling this action,
+such as when build artifacts are downloaded from external sources (e.g., S3) and need
+to be included in the Docker build context.
+
+- Optional parameter
+- Default: false
 
 ### username
 
