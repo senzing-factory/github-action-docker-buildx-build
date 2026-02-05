@@ -90,13 +90,16 @@ runs:
       with:
         registry-type: public
 
-    - name: generate tags
+    - id: generate-tags
+      name: generate tags
       env:
         IMAGE_TAG: ${{ inputs.image-tag }}
         IMAGE_REPOSITORY: ${{ inputs.image-repository }}
         REGISTRY_SERVER: ${{ inputs.registry-server }}
         LOGIN_TO_ECR: ${{ inputs.login-to-ecr }}
         ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+        BUILD_CONTEXT: ${{ inputs.context }}
+        DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
       run: |
         CLEANED_TAG=$(echo "$IMAGE_TAG" | tr -d "/#" )
         tags=""
@@ -107,7 +110,10 @@ runs:
         tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
         tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest"
         echo "[INFO] tags are: $tags"
-        echo "TAGS=${tags}" >> "$GITHUB_ENV"
+        echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+        # Pass through validated context and dockerfile path
+        echo "context=${BUILD_CONTEXT}" >> "$GITHUB_OUTPUT"
+        echo "dockerfile=${DOCKERFILE_PATH}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - id: docker_meta_dockerhub
@@ -134,13 +140,13 @@ runs:
       with:
         annotations: ${{ steps.docker_meta_dockerhub.outputs.annotations }}
         build-args: ${{ inputs.build-options }}
-        context: ${{ inputs.context }}
-        file: ${{ inputs.dockerfile-path }}
+        context: ${{ steps.generate-tags.outputs.context }}
+        file: ${{ steps.generate-tags.outputs.dockerfile }}
         platforms: ${{ inputs.platforms }}
         provenance: mode=max
         push: ${{ inputs.push }}
         sbom: true
-        tags: ${{ env.TAGS }}
+        tags: ${{ steps.generate-tags.outputs.tags }}
 
     - if: ${{ inputs.sign-image == 'true' && inputs.login-to-dockerhub == 'true' }}
       name: Generate DockerHub Attestations
