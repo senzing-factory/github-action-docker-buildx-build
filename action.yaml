@@ -100,6 +100,7 @@ runs:
         IMAGE_REPOSITORY: ${{ inputs.image-repository }}
         REGISTRY_SERVER: ${{ inputs.registry-server }}
         LOGIN_TO_ECR: ${{ inputs.login-to-ecr }}
+        LOGIN_TO_DOCKERHUB: ${{ inputs.login-to-dockerhub }}
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_CONTEXT: ${{ inputs.context }}
         DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
@@ -110,8 +111,12 @@ runs:
           tags="${ECR_REGISTRY}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
           tags="${tags}${ECR_REGISTRY}/${IMAGE_REPOSITORY}:latest,"
         fi
-        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
-        tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest"
+        if [[ "$LOGIN_TO_DOCKERHUB" == "true" ]]; then
+          tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
+          tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest,"
+        fi
+        # Remove trailing comma
+        tags="${tags%,}"
         echo "[INFO] tags are: $tags"
         echo "tags=${tags}" >> "$GITHUB_OUTPUT"
 
