@@ -19,7 +19,7 @@ The GitHub Action performs:
    Configure credentials for ECR registry login
    Skipped by default with `login-to-ecr`
 1. [aws-actions/amazon-ecr-login@v2]
-   Logs into a public ECR registry
+   Logs into an ECR registry (public or private based on `ecr-registry-type`)
    Skipped by default with `login-to-ecr`
 1. [docker/build-push-action@v6]
 1. [anchore/sbom-action@v0.18.0]
@@ -198,6 +198,16 @@ Example: the `1.2.3` in `senzing/senzingapi-runtime:1.2.3`
 - Optional parameter
 - Default: false
 - Only needed if using ECR login.
+
+### ecr-registry-type
+
+The type of ECR registry to log into.
+
+- Optional parameter
+- Default: "public"
+- Values: "public" or "private"
+- Note: Public ECR (`public.ecr.aws`) requires `aws-region: us-east-1`.
+  Private ECR works in any AWS region.
 
 ### password
 
