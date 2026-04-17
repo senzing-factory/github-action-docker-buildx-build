@@ -89,7 +89,7 @@ runs:
     - id: login-ecr
       if: ${{ inputs.login-to-ecr == 'true' }}
       name: login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@v2.1.1
       with:
         registry-type: ${{ inputs.ecr-registry-type }}
 
