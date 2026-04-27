@@ -50,6 +50,9 @@ inputs:
   skip-checkout:
     default: false
     description: Skip the checkout step. Useful when you need to set up the build context before calling this action.
+  skip-latest-tag:
+    default: false
+    description: Skip tagging the image as latest. Useful for staging or non-production builds.
   username:
     description: Username for Docker registry
 
@@ -104,16 +107,21 @@ runs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_CONTEXT: ${{ inputs.context }}
         DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
+        SKIP_LATEST_TAG: ${{ inputs.skip-latest-tag }}
       run: |
         CLEANED_TAG=$(echo "$IMAGE_TAG" | tr -d "/#" )
         tags=""
         if [[ "$LOGIN_TO_ECR" == "true" ]]; then
           tags="${ECR_REGISTRY}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
-          tags="${tags}${ECR_REGISTRY}/${IMAGE_REPOSITORY}:latest,"
+          if [[ "$SKIP_LATEST_TAG" != "true" ]]; then
+            tags="${tags}${ECR_REGISTRY}/${IMAGE_REPOSITORY}:latest,"
+          fi
         fi
         if [[ "$LOGIN_TO_DOCKERHUB" == "true" ]]; then
           tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:$CLEANED_TAG,"
-          tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest,"
+          if [[ "$SKIP_LATEST_TAG" != "true" ]]; then
+            tags="${tags}${REGISTRY_SERVER}/${IMAGE_REPOSITORY}:latest,"
+          fi
         fi
         # Remove trailing comma
         tags="${tags%,}"

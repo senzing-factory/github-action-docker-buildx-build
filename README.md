@@ -262,6 +262,15 @@ to be included in the Docker build context.
 - Optional parameter
 - Default: false
 
+### skip-latest-tag
+
+Skip tagging the image as `latest` in addition to the specified `image-tag`.
+By default, every build is tagged with both the specified tag and `latest`.
+Set to `true` for staging or non-production builds where overwriting `latest` is undesirable.
+
+- Optional parameter
+- Default: false
+
 ### username
 
 The username on the Docker registry server.
