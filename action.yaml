@@ -61,7 +61,7 @@ runs:
   steps:
     - if: ${{ inputs.skip-checkout != 'true' }}
       name: checkout repository
-      uses: actions/checkout@v6.0.2
+      uses: actions/checkout@v6.0.3
       with:
         fetch-depth: "0"
         persist-credentials: false
