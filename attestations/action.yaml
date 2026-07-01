@@ -21,7 +21,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: anchore/sbom-action@v0.18.0
+    - uses: anchore/sbom-action@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
       with:
         artifact-name: ${{ inputs.artifact-name-prefix }}-sbom.spdx
         format: spdx-json
@@ -29,14 +29,14 @@ runs:
         output-file: ${{ inputs.artifact-name-prefix }}-sbom.json
 
     - name: Generate artifact provenance attestation
-      uses: actions/attest-build-provenance@v2
+      uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
       with:
         push-to-registry: true
         subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
         subject-digest: ${{ inputs.subject-digest }}
 
     - name: Generate SBOM attestation
-      uses: actions/attest-sbom@v1
+      uses: actions/attest-sbom@5026d3663739160db546203eeaffa6aa1c51a4d6 # v1
       with:
         subject-name: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
         subject-digest: ${{ inputs.subject-digest }}
