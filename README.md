@@ -24,9 +24,9 @@ The GitHub Action performs:
 1. [docker/build-push-action@v6]
 1. [anchore/sbom-action@v0.18.0]
    Skipped by default with `sign-image`
-1. [actions/attest-build-provenance@v2]
+1. [actions/attest-build-provenance@v4]
    Skipped by default with `sign-image`
-1. [actions/attest-sbom@v1]
+1. [actions/attest@v4.1.0]
    Skipped by default with `sign-image`
 1. [sigstore/cosign-installer@v3]
 
@@ -276,8 +276,8 @@ Set to `true` for staging or non-production builds where overwriting `latest` is
 The username on the Docker registry server.
 
 [action.yaml]: action.yaml
-[actions/attest-build-provenance@v2]: https://github.com/actions/attest-build-provenance
-[actions/attest-sbom@v1]: https://github.com/actions/attest-sbom
+[actions/attest-build-provenance@v4]: https://github.com/actions/attest-build-provenance
+[actions/attest@v4.1.0]: https://github.com/actions/attest
 [actions/checkout@v6]: https://github.com/actions/checkout
 [access token for login]: https://github.com/docker/login-action#docker-hub
 [anchore/sbom-action@v0.18.0]: https://github.com/anchore/sbom-action
