@@ -171,7 +171,12 @@ runs:
         context: ${{ steps.generate-tags.outputs.context }}
         file: ${{ steps.generate-tags.outputs.dockerfile }}
         platforms: ${{ inputs.platforms }}
-        provenance: mode=max
+        # mode=min, not max: `max` puts every build argument into the
+        # published provenance attestation, and `build-args` above is
+        # caller-supplied. Anyone who can pull the image can read them.
+        # `min` keeps the provenance -- source, materials, invocation --
+        # and drops the arguments and environment.
+        provenance: mode=min
         push: ${{ inputs.push }}
         sbom: true
         tags: ${{ steps.generate-tags.outputs.tags }}
