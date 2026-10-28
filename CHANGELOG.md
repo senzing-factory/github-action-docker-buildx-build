@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning].
   build-argument values back out of a published provenance attestation will no
   longer find them.
 
+<!-- Releases 2.0.0 through 2.2.1 were cut without changelog entries; the
+     file resumes here rather than reconstructing them. -->
+
 ## [1.1.0] - 2023-12-06
 
 ### Changed in 1.1.0
