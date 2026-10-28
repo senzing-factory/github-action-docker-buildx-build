@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+## [2.3.0] - 2026-10-28
+
+### Changed in 2.3.0
+
+- The SBOM is generated against the image digest being attested rather than an
+  untagged reference that resolved `:latest`. Previously the SBOM could
+  describe a different image from the one the attestation claimed it described.
+- Provenance is recorded at `mode=min` rather than `mode=max`. `max` wrote every
+  caller-supplied build argument and the build environment into the provenance
+  attestation published to the registry, readable by anyone who can pull the
+  image. `min` keeps the source, materials and invocation. Consumers that read
+  build-argument values back out of a published provenance attestation will no
+  longer find them.
+
 ## [1.1.0] - 2023-12-06
 
 ### Changed in 1.1.0
