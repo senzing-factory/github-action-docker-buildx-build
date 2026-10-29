@@ -25,7 +25,10 @@ runs:
       with:
         artifact-name: ${{ inputs.artifact-name-prefix }}-sbom.spdx
         format: spdx-json
-        image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}
+        # The DIGEST, not the tag: untagged, syft resolves `:latest` and the
+        # SBOM then describes a different image from the one the two steps
+        # below attest. Also what made `skip-latest-tag: true` unusable. #127.
+        image: ${{ inputs.registry-server }}/${{ inputs.image-repository }}@${{ inputs.subject-digest }}
         output-file: ${{ inputs.artifact-name-prefix }}-sbom.json
 
     - name: Generate artifact provenance attestation

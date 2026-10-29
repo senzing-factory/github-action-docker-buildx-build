@@ -68,7 +68,7 @@ runs:
         submodules: recursive
 
     - name: set up QEMU
-      uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4
+      uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
 
     - name: set up Docker Buildx
       uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
@@ -171,7 +171,12 @@ runs:
         context: ${{ steps.generate-tags.outputs.context }}
         file: ${{ steps.generate-tags.outputs.dockerfile }}
         platforms: ${{ inputs.platforms }}
-        provenance: mode=max
+        # mode=min, not max: `max` puts every build argument into the
+        # published provenance attestation, and `build-args` above is
+        # caller-supplied. Anyone who can pull the image can read them.
+        # `min` keeps the provenance -- source, materials, invocation --
+        # and drops the arguments and environment.
+        provenance: mode=min
         push: ${{ inputs.push }}
         sbom: true
         tags: ${{ steps.generate-tags.outputs.tags }}
